@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NetGuard | Network Health Command Center</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/components.css"
+    >
+</head>
+
+
+<body>
+
+    <!-- ==================== TOP BAR ==================== -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                N
+            </div>
+
+            <div class="brand-text">
+
+                <h1>NetGuard</h1>
+
+                <p>
+                    Network Health Command Center
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="topbar-right">
+
+            <div class="connection-status">
+
+                <span
+                    id="connection-dot"
+                    class="status-dot"
+                ></span>
+
+                <span id="connection-text">
+                    Connecting...
+                </span>
+
+            </div>
+
+
+            <button
+                id="refresh-button"
+                class="btn btn-secondary"
+                onclick="manualRefresh()"
+            >
+                ↻ Run Check
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- ==================== MAIN DASHBOARD ==================== -->
+
+    <main class="dashboard">
+
+
+        <!-- ==================== HERO ==================== -->
+
+        <section class="dashboard-hero">
+
+            <div class="hero-content">
+
+                <div class="eyebrow">
+                    NETWORK OVERVIEW
+                </div>
+
+                <h2>
+                    Your network at a glance.
+                </h2>
+
+                <p>
+                    Monitor device availability, latency,
+                    packet loss and active network issues
+                    in real time.
+                </p>
+
+            </div>
+
+
+            <div class="hero-status">
+
+                <div class="health-ring">
+
+                    <div class="health-ring-inner">
+
+                        <strong id="network-health">
+                            0%
+                        </strong>
+
+                        <span>
+                            HEALTH
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hero-status-info">
+
+                    <span
+                        id="network-health-label"
+                        class="health-label"
+                    >
+                        CALCULATING
+                    </span>
+
+                    <p id="network-health-description">
+                        Checking network devices...
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================== SUMMARY ==================== -->
+
+        <section class="summary-grid">
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    ◉
+                </div>
+
+                <div class="summary-content">
+
+                    <span class="card-label">
+                        DEVICES
+                    </span>
+
+                    <strong
+                        id="total-devices"
+                        class="card-value"
+                    >
+                        0
+                    </strong>
+
+                    <span
+                        id="device-summary"
+                        class="card-subtext"
+                    >
+                        No devices
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    ✓
+                </div>
+
+                <div class="summary-content">
+
+                    <span class="card-label">
+                        ONLINE
+                    </span>
+
+                    <strong
+                        id="online-devices"
+                        class="card-value"
+                    >
+                        0
+                    </strong>
+
+                    <span class="card-subtext">
+                        Reachable devices
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    !
+                </div>
+
+                <div class="summary-content">
+
+                    <span class="card-label">
+                        OFFLINE
+                    </span>
+
+                    <strong
+                        id="offline-devices"
+                        class="card-value"
+                    >
+                        0
+                    </strong>
+
+                    <span class="card-subtext">
+                        Unreachable devices
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon alert-icon">
+                    ⚠
+                </div>
+
+                <div class="summary-content">
+
+                    <span class="card-label">
+                        ACTIVE THREATS
+                    </span>
+
+                    <strong
+                        id="active-alerts"
+                        class="card-value"
+                    >
+                        0
+                    </strong>
+
+                    <span class="card-subtext">
+                        Require attention
+                    </span>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- ==================== NETWORK ACTIVITY ==================== -->
+
+        <section class="panel activity-panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <div class="section-eyebrow">
+                        LIVE MONITORING
+                    </div>
+
+                    <h2>
+                        Network Activity
+                    </h2>
+
+                    <p>
+                        Current state of monitored devices
+                    </p>
+
+                </div>
+
+                <div
+                    id="last-updated"
+                    class="last-updated"
+                >
+                        Last updated: —
+                </div>
+
+            </div>
+
+
+            <div
+                id="network-activity"
+                class="network-activity"
+            >
+
+                <div class="empty-state">
+                    Loading network activity...
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================== DEVICES + ALERTS ==================== -->
+
+        <section class="content-grid">
+
+
+            <!-- DEVICE STATUS -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <div class="section-eyebrow">
+                            DEVICES
+                        </div>
+
+                        <h2>
+                            Device Status
+                        </h2>
+
+                        <p>
+                            Current connectivity and health
+                        </p>
+
+                    </div>
+
+                    <button
+                        id="add-device-button"
+                        class="btn btn-primary"
+                        onclick="openAddDeviceModal()"
+                    >
+                        + Add Device
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="device-list"
+                    class="device-list"
+                >
+
+                    <div class="empty-state">
+                        Loading devices...
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ACTIVE ALERTS -->
+
+            <section class="panel alerts-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <div class="section-eyebrow">
+                            ATTENTION REQUIRED
+                        </div>
+
+                        <h2>
+                            Active Alerts
+                        </h2>
+
+                        <p>
+                            Issues detected by NetGuard
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="alert-count-badge"
+                        class="alert-count-badge"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="alerts-container"
+                    class="alerts-container"
+                >
+
+                    <div class="empty-state">
+                        Checking for active alerts...
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </section>
+
+
+
+        
+        <!-- ==================== PERFORMANCE HISTORY ==================== -->
+
+        <section class="panel performance-panel">
+
+            <div class="panel-header">
+                <div>
+                    <div class="section-eyebrow">PERFORMANCE</div>
+                        <h2>Performance History</h2>
+                        <p>Historical latency and packet loss for a selected device</p>
+                    </div>
+
+                    <div class="performance-device-select">
+                        <label for="performance-device">Selected device</label>
+                        <select id="performance-device" onchange="loadPerformanceHistory(this.value)">
+                            <option value="">Select a device</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="performance-chart-grid">
+
+                    <div class="chart-card">
+                        <div class="chart-heading">
+                            <div>
+                                <h3>Latency</h3>
+                                <p>Response time in milliseconds</p>
+                            </div>
+                            <span class="chart-unit">ms</span>
+                        </div>
+
+                        <div class="chart-canvas-wrap">
+                            <canvas id="latency-chart" aria-label="Latency history chart"></canvas>
+                            <div id="latency-empty" class="chart-empty">
+                                Select a device to view latency history.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-heading">
+                            <div>
+                                <h3>Packet Loss</h3>
+                                <p>Percentage of unsuccessful pings</p>
+                            </div>
+                            <span class="chart-unit">%</span>
+                        </div>
+
+                        <div class="chart-canvas-wrap">
+                            <canvas id="packet-loss-chart" aria-label="Packet loss history chart"></canvas>
+                            <div id="packet-loss-empty" class="chart-empty">
+                                Select a device to view packet-loss history.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <p id="performance-status" class="performance-status" aria-live="polite"></p>
+
+        </section>
+
+
+        <!-- ==================== RECENT ACTIVITY ==================== -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <div class="section-eyebrow">
+                        EVENT LOG
+                    </div>
+
+                    <h2>
+                        Recent Activity
+                    </h2>
+
+                    <p>
+                        Latest monitoring events
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="activity-feed"
+                class="activity-feed"
+            >
+
+                <div class="empty-state">
+                    Waiting for monitoring events...
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================== SYSTEM INFO ==================== -->
+
+        <section class="panel system-panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <div class="section-eyebrow">
+                        SYSTEM
+                    </div>
+
+                    <h2>
+                        NetGuard Status
+                    </h2>
+
+                    <p>
+                        Monitoring infrastructure
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="system-grid">
+
+                <div class="system-item">
+
+                    <span>
+                        Backend
+                    </span>
+
+                    <strong>
+                        FastAPI
+                    </strong>
+
+                </div>
+
+
+                <div class="system-item">
+
+                    <span>
+                        Database
+                    </span>
+
+                    <strong>
+                        SQLite
+                    </strong>
+
+                </div>
+
+
+                <div class="system-item">
+
+                    <span>
+                        Monitoring
+                    </span>
+
+                    <strong>
+                        ICMP / Ping
+                    </strong>
+
+                </div>
+
+
+                <div class="system-item">
+
+                    <span>
+                        Monitoring Interval
+                    </span>
+
+                    <strong>
+                        10 seconds
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- Add Device Modal -->
+
+    <div
+        id="add-device-modal"
+        class="modal-overlay"
+    >
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <div class="section-eyebrow">
+                        DEVICE MANAGEMENT
+                    </div>
+
+                    <h3>
+                        Add Network Device
+                    </h3>
+
+                </div>
+
+                <button
+                    class="modal-close"
+                    onclick="closeAddDeviceModal()"
+                    aria-label="Close"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <p class="modal-description">
+                Add a device to NetGuard so it can be monitored
+                automatically.
+            </p>
+
+
+            <form
+                id="add-device-form"
+                onsubmit="submitAddDevice(event)"
+            >
+
+                <div class="form-group">
+
+                    <label for="device-name">
+                        Device Name
+                    </label>
+
+                    <input
+                        id="device-name"
+                        type="text"
+                        placeholder="e.g. Main Router"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="device-host">
+                        Host / IP Address
+                    </label>
+
+                    <input
+                        id="device-host"
+                        type="text"
+                        placeholder="e.g. 192.168.1.1"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="device-type">
+                        Device Type
+                    </label>
+
+                    <select
+                        id="device-type"
+                        required
+                    >
+
+                        <option value="">
+                            Select device type
+                        </option>
+
+                        <option value="Router">
+                            Router
+                        </option>
+
+                        <option value="Switch">
+                            Switch
+                        </option>
+
+                        <option value="Server">
+                            Server
+                        </option>
+
+                        <option value="DNS Server">
+                            DNS Server
+                        </option>
+
+                        <option value="Firewall">
+                            Firewall
+                        </option>
+
+                        <option value="Workstation">
+                            Workstation
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="device-location">
+                        Location
+                    </label>
+
+                    <input
+                        id="device-location"
+                        type="text"
+                        placeholder="e.g. Computer Lab"
+                    >
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        onclick="closeAddDeviceModal()"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        id="save-device-button"
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Add Device
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+
+    <footer>
+
+        <span>
+            NetGuard
+        </span>
+
+        <span>
+            Network Health Monitoring System · 2026
+        </span>
+
+    </footer>
+
+
+
+    <!-- ==================== SCRIPTS ==================== -->
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/dashboard.js"></script>
+
+</body>
+
+</html>
